@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="45dp"
+    android:paddingRight="45dp"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.mrinalraj.coeroutpass.register"
+    android:id="@+id/phoneEditText">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Registration"
+        android:id="@+id/textView3"
+        android:textColor="@color/color_white"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="29dp" />
+
+            <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/id_reg"
+        android:layout_marginTop="20dp"
+        android:hint="COER ID"
+        android:backgroundTint="@color/color_white"
+        android:inputType="number"
+        android:textColorHint="@color/color_white_hint"
+        android:textColor="@color/color_white"
+        android:layout_below="@+id/textView3"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+            <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="phone"
+        android:textColor="@color/color_white"
+        android:ems="10"
+        android:textColorHint="@color/color_white_hint"
+        android:id="@+id/myPhone"
+        android:layout_below="@+id/id_reg"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="20dp"
+        android:hint="Phone Number" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fathersphone"
+        android:hint="Father's Phone Number"
+        android:backgroundTint="@color/color_white"
+        android:layout_marginTop="20dp"
+        android:inputType="phone"
+        android:textColorHint="@color/color_white_hint"
+        android:textColor="@color/color_white"
+        android:layout_below="@+id/myPhone"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dob"
+        android:hint="Date of birth"
+        android:enabled="false"
+        android:backgroundTint="@color/color_white"
+        android:textColorHint="@color/color_white_hint"
+        android:textColor="@color/color_white"
+        android:layout_alignTop="@+id/imageButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/textView3"
+        android:layout_alignEnd="@+id/textView3" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/studentStatus"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/imageButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" >
+
+        <RadioButton
+            android:text="Hosteler"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_white"
+            android:id="@+id/radioButton2"
+            android:buttonTint="@color/colorAccent"
+            android:layout_weight="1" />
+
+        <RadioButton
+            android:text="Day Scholar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/radioButton"
+            android:textColor="@color/color_white"
+            android:buttonTint="@color/colorAccent"
+            android:foregroundTint="@color/color_white"
+            android:layout_weight="1" />
+    </RadioGroup>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageButton"
+                android:src="@android:drawable/ic_menu_my_calendar"
+                android:backgroundTint="@color/colorAccent"
+                android:layout_marginTop="11dp"
+                android:layout_below="@+id/fathersphone"
+                android:layout_toRightOf="@+id/dob"
+                android:layout_toEndOf="@+id/dob" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                app:fabSize="mini"
+                android:layout_below="@+id/validate"
+                android:layout_marginTop="20dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                app:srcCompat="@drawable/submit_btn"
+                android:id="@+id/submitBtn" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorAccent"
+                android:textColor="#f6f6f6"
+                android:layout_marginTop="17dp"
+                android:text="Validate"
+                android:id="@+id/validate"
+                android:layout_below="@+id/studentStatus"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

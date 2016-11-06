@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">COER Outpass</string>
+    <string name="title_activity_main">COER Outpass</string>
+
+    <string-array name="hostel_list">
+        <item>BCJ Bhawan</item>
+        <item>Kund kund Bhawan</item>
+        <item>Gupti Sagar Bhawan</item>
+        <item>Aklank Bhawan</item>
+        <item>Arihant Bhawan</item>
+        <item>Ashok Bhawan</item>
+        <item>Ahilya Bhawan</item>
+        <item>Tarawati Bhawan</item>
+        <item>Saraswati Bhawan</item>
+    </string-array>
+
+</resources>

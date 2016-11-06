@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.mrinalraj.coeroutpass.login_main"
+    android:background="@drawable/bg">
+
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/coer_logo"
+        android:id="@+id/logo"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Hello ! Enter your details."
+        android:id="@+id/flag_text"
+        android:layout_below="@+id/logo"
+        android:textColor="#fff"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:id="@+id/coerid"
+        android:hint="COER ID"
+        android:backgroundTint="@color/color_white"
+        android:textColorHint="@color/color_white_hint"
+        android:textColor="@color/color_white"
+        android:inputType="number"
+        android:layout_below="@+id/flag_text"
+        android:layout_alignLeft="@+id/flag_text"
+        android:layout_alignStart="@+id/flag_text"
+        android:layout_alignRight="@+id/flag_text"
+        android:layout_alignEnd="@+id/flag_text" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:id="@+id/password"
+        android:inputType="textPassword"
+        android:hint="Password"
+        android:backgroundTint="@color/color_white"
+        android:textColorHint="@color/color_white_hint"
+        android:textColor="@color/color_white"
+        android:layout_below="@+id/coerid"
+        android:layout_alignLeft="@+id/coerid"
+        android:layout_alignStart="@+id/coerid"
+        android:layout_alignRight="@+id/coerid"
+        android:layout_alignEnd="@+id/coerid" />
+
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/sendbtn"
+        android:gravity="center_vertical|center_horizontal"
+        android:id="@+id/button"
+        android:layout_marginBottom="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Not Registered Yet? Go here"
+        android:textColor="#ffffff"
+        android:id="@+id/register"
+        android:layout_marginTop="32dp"
+        android:layout_below="@+id/password"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>
