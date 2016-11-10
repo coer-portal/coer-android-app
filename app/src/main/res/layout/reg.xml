@@ -62,7 +62,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="20dp"
-        android:hint="Phone Number" />
+        android:hint="Phone Number"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -80,22 +82,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/dob"
-        android:hint="Date of birth"
-        android:enabled="false"
-        android:backgroundTint="@color/color_white"
-        android:textColorHint="@color/color_white_hint"
-        android:textColor="@color/color_white"
-        android:layout_alignTop="@+id/imageButton"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/textView3"
-        android:layout_alignEnd="@+id/textView3" />
-
-    <RadioGroup
+            <RadioGroup
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -131,29 +118,32 @@
                 android:id="@+id/imageButton"
                 android:src="@android:drawable/ic_menu_my_calendar"
                 android:backgroundTint="@color/colorAccent"
-                android:layout_marginTop="11dp"
+                android:layout_marginTop="13dp"
                 android:layout_below="@+id/fathersphone"
-                android:layout_toRightOf="@+id/dob"
-                android:layout_toEndOf="@+id/dob" />
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
 
-            <android.support.design.widget.FloatingActionButton
+            <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clickable="true"
-                app:fabSize="mini"
-                android:layout_below="@+id/validate"
-                android:layout_marginTop="20dp"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                app:srcCompat="@drawable/submit_btn"
-                android:id="@+id/submitBtn" />
+                android:id="@+id/dob"
+                android:hint="Date of birth"
+                android:enabled="false"
+                android:backgroundTint="@color/color_white"
+                android:textColorHint="@color/color_white_hint"
+                android:textColor="@color/color_white"
+                android:layout_above="@+id/studentStatus"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_toLeftOf="@+id/imageButton"
+                android:layout_toStartOf="@+id/imageButton" />
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/colorAccent"
                 android:textColor="#f6f6f6"
-                android:layout_marginTop="17dp"
+                android:layout_marginTop="28dp"
                 android:text="Validate"
                 android:id="@+id/validate"
                 android:layout_below="@+id/studentStatus"

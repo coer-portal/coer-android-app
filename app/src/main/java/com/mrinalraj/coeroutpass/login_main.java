@@ -24,8 +24,19 @@ import com.mrinalraj.coeroutpass.main;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Calendar;
+
+import javax.net.ssl.HttpsURLConnection;
 
 
 public class login_main extends AppCompatActivity {
@@ -36,8 +47,14 @@ public class login_main extends AppCompatActivity {
     Button login;
     SharedPreferences cred;
     SharedPreferences.Editor cred_edit;
-    JSONObject jsonObj;
-    String name1,password1,coerid1,status;
+    String loginStatus;
+    String pwd;
+    String accessToken;
+    String deviceID;
+    String name;
+
+    SharedPreferences idStore;
+    SharedPreferences.Editor idStoreEdit;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -51,6 +68,11 @@ public class login_main extends AppCompatActivity {
         login=(Button)findViewById(R.id.button);
         cred=getSharedPreferences("PREFS",0);
         cred_edit=cred.edit();
+
+        idStore = getSharedPreferences("IDStore",0);
+        idStoreEdit = idStore.edit();
+
+        deviceID = cred.getString("deviceID",null);
 
         if(cred.getBoolean("isLogged",false)){
             startActivity(new Intent(login_main.this,main.class));
@@ -87,6 +109,7 @@ public class login_main extends AppCompatActivity {
                 }
             }
         });
+
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,35 +117,51 @@ public class login_main extends AppCompatActivity {
                     Toast.makeText(login_main.this, "All fields are Mandatory", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    //coerid1=coerid.getText().toString().trim();
-                    new getAttendance().execute(coerid.getText().toString().trim());
+                    pwd = password.getText().toString().trim();
+                    new loginTask().execute(coerid.getText().toString().trim());
 
                 }
             }
         });
+
         TextView register=(TextView) findViewById(R.id.register);
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(login_main.this,register.class));
+                finish();
             }
         });
 
     }
 
     public void putCred(){
-        cred_edit.putString("coerid",coerid.getText().toString().trim());
-        cred_edit.putString("password",password.getText().toString().trim());
+        cred_edit.putString("AccessToken",accessToken);
+        cred_edit.putString("deviceID",deviceID);
         cred_edit.commit();
+        idStoreEdit.putString("ID",coerid.getText().toString().trim());
+        idStoreEdit.putString("name",name);
+        idStoreEdit.commit();
     }
     public void loginValidateApp(){
         cred_edit.putBoolean("isLogged",true);
         cred_edit.commit();
     }
 
-    public class getAttendance extends AsyncTask<String,Integer,JSONObject> {
+    public class loginTask extends AsyncTask<String,Integer,JSONObject> {
         ProgressDialog pd;
-        InputStream inputStream=null;
+        StringBuffer jsonObject;
+        String json;
+        HttpURLConnection connection;
+        BufferedReader reader;
+        InputStream iStream;
+        OutputStream outStream;
+
+        PrintWriter writer;
+
+        JSONObject loginObject;
+        URL url;
+        String ID;
 
         @Override
         protected void onPreExecute() {
@@ -141,41 +180,72 @@ public class login_main extends AppCompatActivity {
 
         @Override
         protected JSONObject doInBackground(String... strings) {
-            final JSONObject jsonObject;
-            String url="http://coer-backend.herokuapp.com/student/attendance/"+strings[0];
             try {
-                JSONCustom jc=new JSONCustom();
-                jsonObject = jc.getJSONObjectFromURL(url,"GET");
-                if (jsonObject!=null){
-                    cred_edit.putString("name",jsonObject.optString("name"));
-                    cred_edit.putString("attendance",jsonObject.optString("attendance"));
-                    cred_edit.putString("attenLastUpdatedOn",jsonObject.optString("attenLastUpdatedOn"));
-                    cred_edit.putString("status",jsonObject.optString("status"));
-                    cred_edit.commit();
-                    status=jsonObject.optString("status");
-                    login_main.this.runOnUiThread(new Runnable() {
-                        public void run() {
+                url = new URL("https://coer-backend.herokuapp.com/student/login");
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                connection.setRequestProperty("authkey", "SUPERPRIVATE");
+                connection.setRequestProperty("deviceID",deviceID);
+                connection.setRequestProperty("password", pwd);
+                connection.setDoOutput(true);
+                connection.connect();
 
-                        }
-                    });
+                ID = URLEncoder.encode("ID", "UTF-8")+"="+URLEncoder.encode(strings[0],"UTF-8");
+
+                outStream = connection.getOutputStream();
+
+                writer = new PrintWriter(outStream,true);
+                writer.write(ID);
+                writer.close();
+
+                iStream = connection.getInputStream();
+
+                reader = new BufferedReader(new InputStreamReader(iStream));
+                jsonObject = new StringBuffer();
+
+                while((json = reader.readLine()) !=null){
+                    jsonObject.append(json);
                 }
-                else{
-                    login_main.this.runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(login_main.this, "failed", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    Log.d("failed","failed");
-                }
-            }
-            catch (JSONException e){
+
+
+                loginObject = new JSONObject(jsonObject.toString());
+                loginStatus = loginObject.getString("loginStatus");
+                accessToken = loginObject.getString("accesstoken");
+                name = loginObject.getString("name");
+                deviceID = loginObject.getString("deviceID");
+
+                cred_edit.putString("AccessToken",accessToken);
+                cred_edit.commit();
+
+                Log.v("JSON",jsonObject.toString());
+                Log.v("CoerId",strings[0]);
+                Log.v("devID",cred.getString("deviceID","000000"));
+                Log.v("token",cred.getString("AccessToken","abcdef"));
+
+
+            }catch(MalformedURLException e){
+                e.printStackTrace();
+            }catch(IOException e){
+                e.printStackTrace();
+            }catch(JSONException e){
                 e.printStackTrace();
             }
-            catch (IOException e){
-                e.printStackTrace();
+            finally{
+                try{
+                    if(reader!=null) {
+                        reader.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if(connection!=null){
+                    connection.disconnect();
+                }
             }
 
-            return null;
+            return loginObject;
         }
 
         @Override
@@ -186,14 +256,17 @@ public class login_main extends AppCompatActivity {
                     pd.dismiss();
                 }
             });
-            if (status.equals("true")) {
+            if (loginStatus != null && loginStatus.equals("200OK")) {
                 putCred();
                 loginValidateApp();
-                startActivity(new Intent(login_main.this, main.class));
+                Intent i = new Intent(login_main.this, main.class);
+                i.putExtra(main.LOGINID,coerid.getText().toString().trim());
+                i.putExtra(main.LOGINNAME,name);
+                startActivity(i);
                 finish();
             }
             else{
-                Toast.makeText(login_main.this, "Login failed !\nProbably wrong COERID", Toast.LENGTH_SHORT).show();
+                Toast.makeText(login_main.this, "Login failed !", Toast.LENGTH_SHORT).show();
             }
             super.onPostExecute(jsonObject);
         }

@@ -27,17 +27,31 @@ import com.mrinalraj.coeroutpass.frags.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
+import javax.net.ssl.HttpsURLConnection;
 public class main extends AppCompatActivity {
-    SharedPreferences cred;
+    SharedPreferences cred,IDStore;
     SharedPreferences.Editor cred_edit;
     int pos;
+
+    static final String LOGINNAME = "name";
+    static final String LOGINID = "ID";
+    private String token;
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private ViewPager mViewPager;
+    private Intent intent;
+
+    private String attendance;
+    private String attenLastUpdatedOn;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +59,11 @@ public class main extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         cred=getSharedPreferences("PREFS",0);
         cred_edit= cred.edit();
+        intent = getIntent();
+
+        token = cred.getString("AccessToken",null);
+
+        IDStore = getSharedPreferences("IDStore",0);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -66,7 +85,7 @@ public class main extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        new getAttendance().execute(cred.getString("coerid", ""));
+        new GetData().execute(intent.getStringExtra(LOGINID));
     }
 
 
@@ -82,10 +101,6 @@ public class main extends AppCompatActivity {
 
         if (id == R.id.action_logout) {
             cred_edit.putBoolean("isLogged",false);
-            cred_edit.putString("name","");
-            cred_edit.putString("attendance","");
-            cred_edit.putString("attenLastUpdatedOn","");
-            cred_edit.putString("status","");
             cred_edit.commit();
             startActivity(new Intent(main.this, login_main.class));
             finish();
@@ -97,7 +112,7 @@ public class main extends AppCompatActivity {
             return true;
         }
         else if(id == R.id.action_attendance){
-            new AlertDialog.Builder(main.this).setTitle(" "+cred.getString("name","")+" your attendance is").setMessage(cred.getString("attendance","")+"\n"+"as on "+cred.getString("attenLastUpdatedOn", "")).show();
+            new AlertDialog.Builder(main.this).setTitle(" "+IDStore.getString("name","COER")+" your attendance is").setMessage(attendance+"\n"+"as on "+attenLastUpdatedOn).show();
         }
 
         return super.onOptionsItemSelected(item);
@@ -148,9 +163,18 @@ public class main extends AppCompatActivity {
         }
     }
 
-    public class getAttendance extends AsyncTask<String,Integer,JSONObject> {
+    public class GetData extends AsyncTask<String,Integer,JSONObject> {
         ProgressDialog pd;
-        InputStream inputStream=null;
+        URL url;
+        HttpURLConnection connection;
+
+        BufferedReader reader;
+        JSONObject parentObject;
+        JSONObject academicsObject;
+        JSONObject attendanceObject;
+        StringBuffer buffer;
+        String result;
+
 
         @Override
         protected void onPreExecute() {
@@ -158,42 +182,49 @@ public class main extends AppCompatActivity {
                 @Override
                 public void run() {
                     pd=new ProgressDialog(main.this);
-                    pd.setTitle("Welcome "+cred.getString("name",""));
+                    pd.setTitle("Welcome "+IDStore.getString("name","COER"));
                     pd.setMessage("Refreshing data... ");
                     pd.setCancelable(false);
                     pd.show();
                 }
             });
             super.onPreExecute();
+
+            Log.v("ID FUll:",IDStore.getString("ID","00000000"));
         }
 
         @Override
         protected JSONObject doInBackground(String... strings) {
-            final JSONObject jsonObject;
-            String url="http://coer-backend.herokuapp.com/student/attendance/"+strings[0];
-            try {
-                JSONCustom jc=new JSONCustom();
-                jsonObject = jc.getJSONObjectFromURL(url,"GET");
-                if (jsonObject!=null){
-                    cred_edit.putString("name",jsonObject.optString("name"));
-                    cred_edit.putString("attendance",jsonObject.optString("attendance"));
-                    cred_edit.putString("attenLastUpdatedOn",jsonObject.optString("attenLastUpdatedOn"));
-                    cred_edit.putString("status",jsonObject.optString("status"));
-                    cred_edit.commit();
-                    main.this.runOnUiThread(new Runnable() {
-                        public void run() {
+            try{
+               url=new URL("https://coer-backend.herokuapp.com/student/full/"+IDStore.getString("ID","00000000"));
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                connection.setRequestProperty("authkey","testingKEY");
+                connection.setRequestProperty("accesstoken",token);
+                connection.setRequestProperty("deviceID",cred.getString("deviceID",null));
+                connection.setDoInput(true);
+                connection.connect();
 
-                        }
-                    });
+                buffer = new StringBuffer();
+
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                while((result = reader.readLine()) != null){
+                    buffer.append(result);
                 }
-                else{
-                    main.this.runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(main.this, "failed", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    Log.d("failed","failed");
-                }
+
+                Log.v("FUll JSON:",buffer.toString());
+                Log.v("DEVICE id FULL:",cred.getString("deviceID",null));
+                Log.v("access TOKEN FUll:",token);
+
+                parentObject = new JSONObject(buffer.toString());
+                academicsObject = new JSONObject(parentObject.getString("academics"));
+                attendanceObject = new JSONObject((academicsObject.getString("attendance")));
+
+                attendance = attendanceObject.getString("attendance");
+                attenLastUpdatedOn = attendanceObject.getString("attenLastUpdatedOn");
+
+                return parentObject;
+
             }
             catch (JSONException e){
                 e.printStackTrace();

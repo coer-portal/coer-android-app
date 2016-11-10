@@ -63,6 +63,8 @@ public class register extends AppCompatActivity {
 
     SharedPreferences sP;
     SharedPreferences.Editor sPE;
+    String deviceID;
+    String credDevID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +72,9 @@ public class register extends AppCompatActivity {
         setContentView(R.layout.reg);
         getSupportActionBar().setElevation(1);
 
-        sP = getSharedPreferences("RegisterData",0);
+        sP = getSharedPreferences("PREFS",0);
         sPE = sP.edit();
+        credDevID = sP.getString("deviceID",null);
 
         ph = (EditText)findViewById(R.id.myPhone);
         statusGroup = (RadioGroup)findViewById(R.id.studentStatus);
@@ -107,7 +110,7 @@ public class register extends AppCompatActivity {
                 final EditText input2 = new EditText(register.this);
                 LinearLayout lpl=new LinearLayout(register.this);
                 lpl.setOrientation(LinearLayout.VERTICAL);
-                input1.setHint("Enter new Password");
+                input1.setHint("Enter Password");
                 input2.setHint("Re-enter Password");
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -125,8 +128,13 @@ public class register extends AppCompatActivity {
                 passwordDialogue.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Toast.makeText(register.this, input1.getText().toString(), Toast.LENGTH_SHORT).show();
-                        pwd = input1.getText().toString();
+                        if(input1.getText().toString().equals(input2.getText().toString().trim())) {
+                            Toast.makeText(register.this, input1.getText().toString(), Toast.LENGTH_SHORT).show();
+                            pwd = input1.getText().toString();
+                            new RegisterTask().execute("Execute");
+                        }else{
+                            Toast.makeText(register.this, "Passwords Don't Match", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
                 passwordDialogue.show();
@@ -134,13 +142,6 @@ public class register extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.submitBtn);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new RegisterTask().execute("Execute");
-            }
-        });
     }
 
     private void setData(){
@@ -171,7 +172,7 @@ public class register extends AppCompatActivity {
         if(stStatus.equals("Hosteler")){
             stStatus = "hostel";
         }else{
-            if(stStatus.equals("DayScholar")){
+            if(stStatus.equals("Day Scholar")){
                 stStatus = "dayscholar";
             }
         }
@@ -225,9 +226,10 @@ public class register extends AppCompatActivity {
         protected String doInBackground(String... params) {
             try {
                 url = new URL("https://coer-backend.herokuapp.com/student/register");
-                connection = (HttpURLConnection)url.openConnection();
+                connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                connection.setRequestProperty("deviceid",deviceID);
                 connection.setRequestProperty("authkey","SUPERPRIVATE");
                 connection.setRequestProperty("password",pwd);
                 connection.setDoOutput(true);
@@ -250,7 +252,7 @@ public class register extends AppCompatActivity {
 
                 JSONObject registerObject = new JSONObject(res.toString());
                 name = registerObject.getString("name");
-               // registerStatus = registerObject.getString("registered");
+                deviceID = registerObject.getString("deviceID");
 
                 return res.toString();
 
@@ -298,16 +300,17 @@ public class register extends AppCompatActivity {
         }
 
         void setRegisterDialog() throws JSONException{
-            registerStatus = new JSONObject(res.toString()).getString("registered");
+            registerStatus = new JSONObject(res.toString()).getString("registerStatus");
 
-           if(registerStatus !=null && registerStatus.equals("Already Registered")){
+           if(registerStatus !=null && registerStatus.equals("800E")){
                 AlertDialog.Builder registerDialogue=new AlertDialog.Builder(register.this);
                 registerDialogue.setTitle("Already Registered");
                 registerDialogue.setMessage("Try Logging In...");
-               registerDialogue.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+               registerDialogue.setPositiveButton("LogIn", new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialogInterface, int i) {
                        startActivity(new Intent(register.this,login_main.class));
+                       finish();
                    }
                });
                 registerDialogue.show();
@@ -315,8 +318,11 @@ public class register extends AppCompatActivity {
 
            else {
 
-               if(registerStatus != null && registerStatus.equals("true")) {
+               if(registerStatus != null && registerStatus.equals("200OK")) {
                    String msg = "Name = " + name + "\n" + "ID = " + id + "\n" + "D.O.B = " + db + "\n" + "Your Phone Number = " + pno + "\n" + "Father's Phone Number = " + fPno + "\n" + "Current Status = " + stStatus;
+
+                       sPE.putString("deviceID", deviceID);
+                       sPE.commit();
 
                    AlertDialog.Builder registerDialogue = new AlertDialog.Builder(register.this);
                    registerDialogue.setTitle("Registration Successfull");
@@ -324,14 +330,8 @@ public class register extends AppCompatActivity {
                    registerDialogue.setPositiveButton("LogIn", new DialogInterface.OnClickListener() {
                        @Override
                        public void onClick(DialogInterface dialogInterface, int i) {
-                           sPE.putString("Name", name);
-                           sPE.putString("ID", id);
-                           sPE.putString("DOB", db);
-                           sPE.putString("MyPhone", pno);
-                           sPE.putString("FatherPhone", fPno);
-                           sPE.putString("Status", stStatus);
-
                            startActivity(new Intent(register.this,login_main.class));
+                           finish();
 
                        }
                    });
